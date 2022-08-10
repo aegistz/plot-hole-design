@@ -1,6 +1,30 @@
-version: '3.5' # We use version 3.5 syntax
+version: '3.1'
 services:
-  # Here we define our service(s)
+  mysql:
+    image: mysql:5.7
+    ports:
+      - 3308:3306
+    volumes:
+      - "./data:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: testhaha
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - "./datamongo:/data/db"
+    ports:
+      - 27017:27017
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8000:80
+    environment:
+      PMA_PASSWORD: 1234
+      PMA_USER: root
+      PMA_HOSTS: mysql
+
   angular-service:
     # The name of the service
     container_name: angularcontainer # Container name
