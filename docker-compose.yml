@@ -27,11 +27,11 @@ services:
 
   angular-service:
     # The name of the service
-    container_name: angularcontainer # Container name
-    build: ./angulardockerproject # Location of our Dockerfile
+    container_name: plot-hole-design # Container name
+    build: ./plot-hole-design # Location of our Dockerfile
     volumes:
       # Volume binding
-      - './angulardockerproject:/usr/src/app'
+      - './plot-hole-design:/usr/src/app'
     ports:
       - '4200:4200' # Port mapping
     command: >
