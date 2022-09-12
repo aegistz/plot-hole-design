@@ -14,16 +14,17 @@ export class PlotHoleDesignComponent implements OnInit {
   burden = 5
   spacing = 7
 
+  demo_shape: any
+  line_hole: any
 
   constructor() {
 
   }
 
   ngOnInit(): void {
-    this.map = L.map('map').setView([16.742044977987174, 100.19485029705909], 16);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap'
+    this.map = L.map('map').setView([14.69393, 100.81576], 18);
+    let Google_Hybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+      maxZoom: 22,
     }).addTo(this.map);
 
     this.map.pm.addControls({
@@ -31,7 +32,7 @@ export class PlotHoleDesignComponent implements OnInit {
       drawMarker: false,
       drawCircle: false,
       drawCircleMarker: false,
-      drawPolyline: false,
+      drawPolyline: true,
       drawRectangle: true,
       drawPolygon: true,
       editMode: false,
@@ -41,6 +42,8 @@ export class PlotHoleDesignComponent implements OnInit {
     });
 
     this.map.on('pm:create', (e: any) => {
+      console.log(e);
+
       var lyr = e.layer;
       var geom = (JSON.stringify(lyr.toGeoJSON().geometry));
       var nietos = [];
@@ -56,7 +59,15 @@ export class PlotHoleDesignComponent implements OnInit {
       FeatureCo["features"] = [obj]
       nietos.push(FeatureCo)
 
-      this.get_point(nietos[0])
+      if (e.shape == "Line") {
+        this.line_hole = nietos[0].features[0]
+        this.get_point(this.demo_shape)
+      } else {
+        this.demo_shape = nietos[0].features[0]
+
+        // this.get_point(nietos[0])
+      }
+
 
 
     })
@@ -64,6 +75,11 @@ export class PlotHoleDesignComponent implements OnInit {
 
   //plan
   async get_point(data) {
+    console.log(this.line_hole);
+
+
+
+
     var explode = turf.explode(data);
     let point_use = []
     for (let i = 0; i < explode.features.length; i++) {
@@ -88,11 +104,16 @@ export class PlotHoleDesignComponent implements OnInit {
     point_use.sort(function (a, b) {
       return b.distance - a.distance;
     });
+    let LP_1 = turf.point(this.line_hole.geometry.coordinates[0])
+    let LP_2 = turf.point(this.line_hole.geometry.coordinates[1])
 
-    var bearing = turf.bearing(point_use[0].pt1, point_use[0].pt2);
+    var bearing = turf.bearing(LP_1, LP_2);
 
-    var st_pt1 = turf.rhumbDestination(point_use[0].pt1, 1, bearing);
-    var st_pt2 = turf.rhumbDestination(point_use[0].pt2, 1, bearing - 180);
+    var st_pt1 = turf.rhumbDestination(LP_1, 1, bearing);
+    var st_pt2 = turf.rhumbDestination(LP_2, 1, bearing - 180);
+
+    // var st_pt1 = turf.point(this.line_hole.geometry.coordinates[0]);
+    // var st_pt2 = turf.point(this.line_hole.geometry.coordinates[1]);
 
     let make_point = []
 
@@ -113,6 +134,8 @@ export class PlotHoleDesignComponent implements OnInit {
 
       var linestring1 = turf.lineString([[destination1.geometry.coordinates[0], destination1.geometry.coordinates[1]], [destination2.geometry.coordinates[0], destination2.geometry.coordinates[1]]]);
       var length1 = turf.length(linestring1);
+
+      // L.geoJson(linestring1).addTo(this.map)
 
       let count_point_in_line = (length1 * 1000) / this.spacing
       for (let i = 0; i < count_point_in_line; i++) {
