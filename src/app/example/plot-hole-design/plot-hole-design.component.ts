@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet.pm';
 import * as turf from '@turf/turf';
-
+import 'leaflet-measure';
 
 @Component({
   selector: 'app-plot-hole-design',
@@ -26,6 +26,8 @@ export class PlotHoleDesignComponent implements OnInit {
     let Google_Hybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
       maxZoom: 22,
     }).addTo(this.map);
+    var measureControl = new L.Control.Measure();
+    measureControl.addTo(this.map);
 
     this.map.pm.addControls({
       position: 'topright',
@@ -71,6 +73,7 @@ export class PlotHoleDesignComponent implements OnInit {
 
 
     })
+
   }
 
   //plan
